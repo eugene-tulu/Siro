@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Siro — Live Shop AI</title>
+  <link rel="stylesheet" href="/css/dashboard.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <span class="logo">Siro</span>
+        <span class="tagline">24/7 Live Shopping Agent · Livepeer + Jev</span>
+      </div>
+      <div class="system-status">
+        <span class="status-badge" id="sessionBadge">LIVE</span>
+        <span class="muted" id="uptime">00:00:00</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="grid">
+        <article class="panel stream">
+          <h2>Live Stream</h2>
+          <div class="stream-frame">
+            <div class="stream-placeholder">
+              <div class="stream-label">LIVE</div>
+              <div class="item-title" id="itemTitle">Loading item…</div>
+              <div class="item-meta" id="itemMeta"></div>
+              <div class="bid-ticker" id="bidTicker">Current price: —</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel chat">
+          <h2>Live Chat</h2>
+          <div class="chat-log" id="chatLog"></div>
+          <form class="chat-form" id="chatForm">
+            <input id="chatInput" placeholder="Ask about the product or make an offer…" autocomplete="off" />
+            <button type="submit">Send</button>
+          </form>
+        </article>
+
+        <article class="panel showcase">
+          <h2>Product Showcase</h2>
+          <div class="showcase-log" id="showcaseLog">
+            <div class="empty">No showcases yet.</div>
+          </div>
+        </article>
+
+        <article class="panel decisions">
+          <h2>Jev Decisions</h2>
+          <div class="decision-log" id="decisionLog">
+            <div class="empty">No decisions yet.</div>
+          </div>
+        </article>
+
+        <article class="panel ledger">
+          <h2>Sales</h2>
+          <div class="ledger-table" id="ledgerTable">
+            <div class="empty">No sales yet.</div>
+          </div>
+        </article>
+
+        <article class="panel logs">
+          <h2>System Log</h2>
+          <div class="system-log" id="systemLog"></div>
+        </article>
+
+        <article class="panel controls">
+          <h2>Controls</h2>
+          <div class="control-group">
+            <button id="btnStop">Stop Stream</button>
+            <button id="btnStart">Start Stream</button>
+          </div>
+          <div class="legend">
+            <div class="legend-title">Session state</div>
+            <div class="legend-item"><span class="dot live"></span> LIVE</div>
+            <div class="legend-item"><span class="dot showcasing"></span> SHOWCASING</div>
+            <div class="legend-item"><span class="dot engaging"></span> ENGAGING</div>
+            <div class="legend-item"><span class="dot offline"></span> OFFLINE</div>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

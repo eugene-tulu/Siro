@@ -1,0 +1,19 @@
+{
+  "name": "siro",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Siro — Autonomous AI auctioneer infrastructure powered by Livepeer Agent + Jev",
+  "main": "src/server/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server/index.js",
+    "dev": "node --watch src/server/index.js",
+    "demo": "node src/server/index.js",
+    "test": "node --test tests/core.test.js"
+  },
+  "dependencies": {
+    "@typesafe-ai/sdk": "^0.6.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.22.3"
+  }
+}
