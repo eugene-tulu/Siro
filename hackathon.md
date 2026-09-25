@@ -66,16 +66,19 @@ A 24/7 autonomous live shopping agent that combines:
 36. `dashboard.js`: Config panel state management; `refreshConfig()`, `renderProductList()`, `window.removeProduct()`, `refreshPrompts()`; SSE handlers for `session_state`, `product_showcase`, `agent_response`, `catalog` log
 37. `dashboard.css`: Config panel styles (`.config-panel`, `.config-form`, `.product-list`, prompt editor)
 
-### Catalog mode fixes (budget exhaustion mitigation)
-37. `index.js`: Catalog mode `product_showcase` handler skips `agent.doProactiveShowcase()` + `livepeer.startStream()` + `livepeer.generateScene()` to prevent rate limit exhaustion
-38. `livepeer.js`: `generateScene()` adds `action: "generate"` for MCP compatibility
-39. `index.js`: Graceful shutdown clears `catalogInterval` in addition to `demoInterval`
-40. `index.js`: Health endpoint reports `mode` field (catalog/video/host)
+### Catalog mode (post-budget-exhaustion)
+38. `index.js`: `STAGE=catalog` uses `cycleCatalog()` — SSE-driven product slideshow with 12s interval (configurable); uses product images as fallback when Livepeer budget exhausted
+39. `livepeer.js`: `generateScene()` adds `action: "generate"` for MCP compatibility
+40. `index.js`: Catalog mode skips `agent.doProactiveShowcase()`, `livepeer.startStream()`, `livepeer.generateScene()` in showcase handler — prevents rate limit exhaustion when budget is low
+
+### UX cleanup (remove AI slop system messages)
+41. `dashboard.js`: `renderActivation()` replaced `data.lastMessage` (which showed Livepeer system jargon like "Check your inbox at test@livepeer.org...") with clean user-facing status text ("Activated — ~$200 demo budget unlocked")
+42. `index.html`: Config panel `promptStatus` text changed from "Loaded from user config" to "Customize AI image generation prompts"
 
 ### Design (UI/UX improvement)
-41. `dashboard.css`: Redesigned — luxury black + gold palette (`#d4af37`); Playfair Display titles; Inter body; glass cards; refined typography hierarchy; white space; micro-interactions
-42. `index.html`: Playfair + Inter font links; refined brand markup (`Siro.`); activation panel + config panel
-43. `dashboard.js`: SSE event handling for `session_state`, `product_showcase`, `agent_response`, `livepeer_result`, `jev_decision`, `sale_made`; config panel management (add/remove products, store settings)
+44. `dashboard.css`: Redesigned — minimal luxury: muted gold (`#c9a77b`) accents on true black (`#0a0a0c`); Playfair Display for product titles, Inter for body; removed scanline textures and diagonal gradients; simplified 2-column grid (was 3-column); unified panel style without competing decorative elements
+45. `index.html`: Playfair + Inter font links; refined brand markup (`Siro.`); restructured controls panel into clear sections (Agent → Store → Products → Prompts)
+46. `dashboard.js`: SSE event handling for `session_state`, `product_showcase`, `agent_response`, `livepeer_result`, `jev_decision`, `sale_made`; config panel management (add/remove products, store settings, prompt templates)
 
 ---
 
@@ -155,7 +158,7 @@ Our app respects these limits via `src/utils/rateLimiter.js`. Before the email, 
 ✅ Graceful shutdown (SIGTERM / SIGINT)
 ✅ Catalog slideshow cycling (12s interval, user-configurable)
 ✅ User products persist across restarts (~/.siro/user-config.json)
-✅ 21/24 tests passing (3 known pre-existing failures: Livepeer creditsHint string format)
+✅ 21/24 tests passing (3 pre-existing failures: Livepeer `creditsHint` string format; 1 flaky timing test for `getUptime() > 0` that passes intermittently)
 ```
 
 ---
@@ -251,7 +254,7 @@ Ready for Atumera / Livepeer Agent Hackathon Track 1 submission with:
 - Activation flow (email → 8-char code → enhanced budget)
 - Catalog-first architecture (scalable from catalog → video → host)
 - Config-first design (user sets store name, greeting, products, prompt templates via UI/API)
-- All P0 bugs fixed; P1 fixes implemented; design refined (black + gold luxury theme)
+- All P0 bugs fixed; critical bugs found during demo fixed; design refined (anti-slop minimal luxury)
 - Catalog slideshow with user-configurable products + prompt templates (works even with exhausted Livepeer budget)
 - End-to-end verified (server responds; health returns mode + activation + session + media; SSE streams product showcases)
 

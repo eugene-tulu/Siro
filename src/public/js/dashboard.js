@@ -287,18 +287,26 @@ function renderActivation(data) {
   if (!activationPanel || !data) return;
   activationPanel.dataset.mode = data.keyless ? "keyless" : "keyed";
   activationPanel.dataset.activated = data.activated ? "true" : "false";
-  if (!data.keyless) {
-    activationStatus.textContent = "Using a Livepeer API key — email activation is skipped.";
-    return;
-  }
+
   if (data.activated) {
-    activationStatus.textContent = data.lastMessage || "Activated — about $200 of demo rendering on this server IP.";
+    if (!data.keyless) {
+      activationStatus.textContent = "Active — using your Livepeer API key";
+    } else {
+      activationStatus.textContent = "Activated — ~$200 demo budget unlocked";
+    }
     return;
   }
-  const hint = data.email
-    ? `Code sent to ${data.email}. Paste it below (check spam). Unactivated keyless credit is about $10.`
-    : "No API key: request a Livepeer activation code to raise demo credits from about $10 to about $200.";
-  activationStatus.textContent = data.lastMessage || hint;
+
+  if (!data.keyless) {
+    activationStatus.textContent = "Active — using your Livepeer API key";
+    return;
+  }
+
+  if (data.email) {
+    activationStatus.textContent = `Code sent to ${data.email}. Paste it below (check spam).`;
+  } else {
+    activationStatus.textContent = "Enter your email to request an activation code (~$10 → ~$200)";
+  }
 }
 
 async function refreshActivation() {
