@@ -221,3 +221,87 @@ test("jev router — heuristic fallback (no API key)", async (t) => {
     assert.equal(result.parsedBid, null);
   });
 });
+
+test("livepeer keyless activation", async (t) => {
+  const { createLivepeerClient } = await import("../src/integrations/livepeer.js");
+
+  function jsonResponse(body) {
+    return {
+      ok: true,
+      headers: { get: () => "application/json" },
+      text: async () => JSON.stringify(body),
+    };
+  }
+
+  await t.test("request_activation posts email to creative MCP", async () => {
+    const eventBus = new EventEmitter();
+    const calls = [];
+    const livepeer = createLivepeerClient({
+      eventBus,
+      fetchFn: async (url, init) => {
+        calls.push({ url, body: JSON.parse(init.body) });
+        return jsonResponse({
+          jsonrpc: "2.0",
+          result: {
+            content: [{ type: "text", text: "Check your inbox at gntulu@gmail.com" }],
+          },
+        });
+      },
+    });
+
+    const result = await livepeer.requestActivation("gntulu@gmail.com");
+    assert.equal(result.ok, true);
+    assert.equal(result.keyless, true);
+    assert.equal(result.activated, false);
+    assert.equal(result.creditsHint, "~10");
+    assert.equal(calls[0].url, "https://agent.livepeer.org/api/mcp/creative");
+    assert.equal(calls[0].body.method, "tools/call");
+    assert.equal(calls[0].body.params.name, "request_activation");
+    assert.equal(calls[0].body.params.arguments.email, "gntulu@gmail.com");
+  });
+
+  await t.test("activate records success from structuredContent", async () => {
+    const eventBus = new EventEmitter();
+    const livepeer = createLivepeerClient({
+      eventBus,
+      fetchFn: async (_url, init) => {
+        const body = JSON.parse(init.body);
+        if (body.params.name === "activate") {
+          return jsonResponse({
+            jsonrpc: "2.0",
+            result: {
+              content: [{ type: "text", text: "You're activated on Livepeer Agent" }],
+              structuredContent: { activated: true },
+            },
+          });
+        }
+        return jsonResponse({ jsonrpc: "2.0", result: { content: [] } });
+      },
+    });
+
+    const result = await livepeer.activate("5TD47DDY");
+    assert.equal(result.ok, true);
+    assert.equal(result.activated, true);
+    assert.equal(result.creditsHint, "~200");
+    assert.equal(livepeer.getActivation().activated, true);
+  });
+
+  await t.test("unknown activation code does not unlock", async () => {
+    const eventBus = new EventEmitter();
+    const livepeer = createLivepeerClient({
+      eventBus,
+      fetchFn: async () =>
+        jsonResponse({
+          jsonrpc: "2.0",
+          result: {
+            content: [{ type: "text", text: "That activation code didn't work (unknown activation code)." }],
+            structuredContent: { activated: false, reason: "unknown activation code" },
+          },
+        }),
+    });
+
+    const result = await livepeer.activate("INVALID1");
+    assert.equal(result.ok, false);
+    assert.equal(result.activated, false);
+  });
+});

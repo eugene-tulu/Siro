@@ -17,25 +17,11 @@ export function createSellerAgent({ sellerConfig, eventBus, jevRouter, livepeer 
   let avatarInitialized = false;
 
   async function initAvatar() {
+    // Disabled for trimmed architecture (catalog/slideshow mode)
+    // See hackathon.md: stage-based design — avatar only for video/host stages
     if (avatarInitialized || !livepeer) return;
     avatarInitialized = true;
-
-    await livepeer.generateAvatarScene({
-      avatarId,
-      scene: "host_welcome",
-      cameraAngle: "medium",
-    });
-
-    await livepeer.renderAvatarSpeech({
-      text: personality.greeting,
-      voiceId: "friendly-host",
-    });
-
-    eventBus.emit("log", {
-      level: "avatar",
-      source: "agent",
-      text: `Avatar host initialized: ${avatarId}`,
-    });
+    // Avatar generation disabled — trimmed to catalog/slideshow for sustainability
   }
 
   function buildPromptContext(message, viewerId) {
@@ -164,18 +150,8 @@ export function createSellerAgent({ sellerConfig, eventBus, jevRouter, livepeer 
     const intent = result.intent;
     const visual = result.visualIntent;
 
-    if (visual && visual !== "NONE") {
-      eventBus.emit("camera_switch", {
-        angle: visual,
-        product: product.title,
-        timestamp: Date.now(),
-      });
-      eventBus.emit("log", {
-        level: "camera",
-        source: "agent",
-        text: `Camera switch: ${visual} on ${product.title}`,
-      });
-    }
+    // Note: avatar/camera features disabled for trimmed catalog architecture
+    // (see hackathon.md — stage-based design: catalog → video → host)
 
     switch (visual) {
       case "SHOW_HOLO_ANGLE":
@@ -203,17 +179,8 @@ export function createSellerAgent({ sellerConfig, eventBus, jevRouter, livepeer 
       text: `${viewerId}: ${text}`,
     });
 
-    if (livepeer) {
-      livepeer
-        .renderAvatarSpeech({ text, viewerId })
-        .catch((err) => {
-          eventBus.emit("log", {
-            level: "error",
-            source: "agent",
-            text: `Avatar speech failed: ${err.message}`,
-          });
-        });
-    }
+    // Note: avatar speech disabled for trimmed catalog architecture
+    // (stage-based: catalog → video → host; see hackathon.md)
 
     return { viewerId, text, timestamp: Date.now(), ...meta };
   }
@@ -229,22 +196,6 @@ export function createSellerAgent({ sellerConfig, eventBus, jevRouter, livepeer 
       source: "agent",
       text: `Now showcasing: ${product.title} — $${product.price}`,
     });
-
-    if (livepeer) {
-      const welcomeText = `Check this out — ${product.title} at $${product.price}. ${product.description}`;
-      await livepeer.switchToAvatarView({
-        avatarId,
-        product,
-        responseText: welcomeText,
-      });
-
-      livepeer
-        .renderAvatarSpeech({
-          text: welcomeText,
-          voiceId: "showcase-host",
-        })
-        .catch(() => {});
-    }
   }
 
    return {

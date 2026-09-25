@@ -1,6 +1,8 @@
 node_modules
 .env
+.livepeer-activation.json
 dist
 coverage
 *.log
 .DS_Store
+.kilo

@@ -113,7 +113,6 @@ export function buildLiveSession({ sellerConfig, eventBus, clock = Date.now }) {
       });
 
       // Re-enter showcase after idle engagement
-      setState("SHOWCASING");
       showcaseLoop();
     }, settings.idleEngagementMs || 8000);
   }
@@ -152,6 +151,7 @@ export function buildLiveSession({ sellerConfig, eventBus, clock = Date.now }) {
   return {
     getState: () => state,
     getActiveProduct: () => currentProduct,
+    setActiveProduct: (p) => { currentProduct = p; },
     start,
     onBuyerMessage,
     stop,

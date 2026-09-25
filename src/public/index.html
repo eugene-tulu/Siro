@@ -3,15 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <title>Siro — Live Shop AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/dashboard.css" />
 </head>
 <body>
   <div class="app">
     <header>
-      <div class="brand">
-        <span class="logo">Siro</span>
-        <span class="tagline">24/7 Live Shopping Agent · Livepeer + Jev</span>
-      </div>
+        <div class="brand">
+          <span class="logo">Siro<span class="dot">.</span></span>
+          <span class="tagline">Live Shopping AI · Livepeer Agent + Jev</span>
+        </div>
       <div class="system-status">
         <span class="status-badge" id="sessionBadge">LIVE</span>
         <span class="muted" id="uptime">00:00:00</span>
@@ -21,11 +25,12 @@
     <main>
       <section class="grid">
         <article class="panel stream">
-          <h2>Live Stream</h2>
-          <div class="stream-frame">
-            <div class="stream-placeholder">
+          <h2>Live Catalog</h2>
+          <div class="stream-frame" id="streamFrame">
+            <img id="streamImage" class="stream-image" src="" alt="Product" style="display:none; max-width:100%; max-height:100%; border-radius:10px; object-fit:cover;" />
+            <div class="stream-placeholder" id="streamPlaceholder">
               <div class="stream-label">LIVE</div>
-              <div class="item-title" id="itemTitle">Loading item…</div>
+              <div class="item-title" id="itemTitle">Loading catalog…</div>
               <div class="item-meta" id="itemMeta"></div>
               <div class="bid-ticker" id="bidTicker">Current price: —</div>
             </div>
@@ -72,6 +77,51 @@
           <div class="control-group">
             <button id="btnStop">Stop Stream</button>
             <button id="btnStart">Start Stream</button>
+          </div>
+          <div class="activation" id="activationPanel">
+            <div class="legend-title">Livepeer Agent Activation</div>
+            <p class="activation-status" id="activationStatus">Checking activation status…</p>
+            <form class="activation-form" id="activationRequestForm">
+              <input id="activationEmail" type="email" placeholder="you@email.com" autocomplete="email" required />
+              <button type="submit">Request code</button>
+            </form>
+            <form class="activation-form" id="activationRedeemForm">
+              <input id="activationCode" placeholder="8-character code" autocomplete="off" maxlength="8" required />
+              <button type="submit">Activate</button>
+            </form>
+          </div>
+          <div class="config-panel" id="configPanel">
+            <div class="legend-title">Your Store Config</div>
+            <p class="activation-status" id="configStatus">Loading…</p>
+            <form class="config-form" id="storeConfigForm">
+              <input id="configStoreName" placeholder="Store name" />
+              <input id="configGreeting" placeholder="Greeting message" />
+              <input id="configShowcaseDuration" type="number" placeholder="Showcase ms (e.g. 12000)" />
+              <button type="submit">Save</button>
+            </form>
+            <div class="legend">
+              <div class="legend-title">Add Product</div>
+              <form class="config-form" id="addProductForm">
+                <input id="productTitle" placeholder="Product title" required />
+                <input id="productPrice" type="number" placeholder="Price ($)" />
+                <input id="productImage" placeholder="Image URL" />
+                <textarea id="productDescription" placeholder="Description (optional)" rows="2"></textarea>
+                <button type="submit">Add Product</button>
+              </form>
+            </div>
+            <div class="product-list" id="productList">
+              <div class="empty">No custom products yet.</div>
+            </div>
+          </div>
+<div class="legend">
+            <div class="legend-title">Prompt Templates</div>
+            <p class="activation-status" id="promptStatus">Loaded from user config</p>
+            <form class="config-form" id="promptForm">
+              <textarea id="promptCatalog" placeholder="Catalog image prompt (use {productTitle}, {productCondition})"></textarea>
+              <textarea id="promptShowcase" placeholder="Showcase scene prompt"></textarea>
+              <textarea id="promptAvatar" placeholder="Avatar prompt"></textarea>
+              <button type="submit">Save Prompts</button>
+            </form>
           </div>
           <div class="legend">
             <div class="legend-title">Session state</div>
